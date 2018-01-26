@@ -6,15 +6,10 @@ i = 1;
 j = 1;
 init = zeros(10,4);
 previous = zeros(10,2);
-
 temp = 300;
 m0 = 9.11*10^-31;
 mn = 0.26*m0;
-kb = 1.38*10^-23;
-v = sqrt((kb*temp)/mn);
-
-colour = hsv(10);
-
+kb = 1.38*10^
 	while i<=10
         j = 1;
            while j<=4
@@ -29,7 +24,7 @@ colour = hsv(10);
                    init(i,j) = randdirection * 2 * pi; %assign random direction between 0 adn 2pi in radians
                else
                    
-                   init(i,j) = v; %assign random velocity between 0 and 5
+                   init(i,j) = 5; %assign random velocity between 0 and 5
                end   
                    j = j + 1;
            end
@@ -37,7 +32,7 @@ colour = hsv(10);
     end
     
     
-    timestep = 0.00000000000001;
+    timestep = 0.000000001;
     finaltime = 0.0001;
     
     
@@ -62,7 +57,7 @@ colour = hsv(10);
                             init(j,4) = -init(j,4);
                             init(j,3) = pi - init(j,3);
                        end
-                     plot([previous(j,1),init(j,1)],[previous(j,2),init(j,2)],'color',colour(j,:)); %initialize positions
+                     plot([previous(j,1),init(j,1)],[previous(j,2),init(j,2)]); %initialize positions
                       axis([0 200*10^-9 0 100*10^-9]);     
                  end
         previous (:,1) = init(:,1);
@@ -74,6 +69,6 @@ colour = hsv(10);
             
         
         hold on;
-        pause(0.001);
+        pause(0.1);
     end
   
