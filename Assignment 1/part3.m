@@ -12,8 +12,8 @@ ybox2 = 60*10^-9;
 ystart = 0;
 i = 1;
 j = 1;
-init = zeros(10,4);
-previous = zeros(10,2);
+init = zeros(30,4);
+previous = zeros(30,2);
 
 temp = 300;
 m0 = 9.11*10^-31;
@@ -24,12 +24,12 @@ kb = 1.38*10^-23;
 amount = 10;
 v = sqrt((2*kb*temp)/mn);
 
-colour = hsv(10);
+colour = hsv(30);
 
 tmn = 0.2*10^-12;
 pscat = 1 - exp(-0.00000000000001/tmn);
 
-while i<=10
+while i<=30
     j = 1;
     while j<=4
         
@@ -81,7 +81,7 @@ for i =0:timestep:finaltime
     
     
     
-    for j=1:1:10
+    for j=1:1:30
         
         if ((init(j,1)+init(j,2)*timestep)>=xlimit)
             init(j,1) = xstart;
@@ -179,7 +179,7 @@ for i =0:timestep:finaltime
 %            init(:,3) = newd;
 %        end  
 %     
-    title '2-D Trajectories of Electrons';
+    title 'Part 3: 2-D Trajectories of Electrons';
     hold on;
-    pause(0.001);
+    pause(0.0000000001);
 end
