@@ -1,0 +1,449 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>DriftDiffTran</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-02-15"><meta name="DC.source" content="DriftDiffTran.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% clear all</span>
+clearvars
+clearvars <span class="string">-GLOBAL</span>
+close <span class="string">all</span>
+format <span class="string">shorte</span>
+set(0,<span class="string">'DefaultFigureWindowStyle'</span>,<span class="string">'docked'</span>)
+<span class="keyword">global</span> C V Mun Mup Gv Dn Dp Bv Em DnM MunM DpM MupM np pp x xm n p
+<span class="keyword">global</span> Rho divFp divFn niSi TwoCarriers t EpiSi n0 p0 tauSi
+<span class="keyword">global</span> Coupled NetDoping l PlotYAxis PlotSS im map
+<span class="keyword">global</span> PlotCount doPlotImage
+
+C.q_0 = 1.60217653e-19;             <span class="comment">% electron charge</span>
+C.hb = 1.054571596e-34;             <span class="comment">% Dirac constant</span>
+C.h = C.hb*2*pi;                    <span class="comment">% Planck constant</span>
+C.m_0 = 9.10938215e-31;             <span class="comment">% electron mass</span>
+C.kb = 1.3806504e-23;               <span class="comment">% Boltzmann constant</span>
+C.eps_0 = 8.854187817e-12;          <span class="comment">% vacuum permittivity</span>
+C.Mun_0 = 1.2566370614e-6;           <span class="comment">% vacuum permeability</span>
+C.c = 299792458;<span class="comment">% speed of light</span>
+
+Temp = 300;
+C.Vt = C.kb*Temp/C.q_0;
+
+EpiSi = C.eps_0*11.68;
+MunSi = 1400*1e-4; <span class="comment">% cm2 V-1s-1 * 1/(100 cm/m)^2</span>
+DnSi = MunSi*C.kb*Temp/C.q_0; <span class="comment">% D = kt/q Mun</span>
+MupSi = 450*1e-4; <span class="comment">% cm2 V-1s-1 * 1/(100 cm/m)^2</span>
+DpSi = MunSi*C.kb*Temp/C.q_0; <span class="comment">% D = kt/q Mun</span>
+tauSi = 1e-8;
+niSi = 1e10*1e6; <span class="comment">% 1/cm^3 * (100 cm/m)^3 intrinsic concentration</span>
+
+JBC = 0; <span class="comment">% No flow BC by default</span>
+RVbc = 0; <span class="comment">% Ground Rightside</span>
+SecondSim = 0;
+
+PlotSS = 1;
+PlotFile = <span class="string">'image.gif'</span>;
+PlotCount = 0;
+doPlotImage = 0; <span class="comment">% set to 1 to draw the image</span>
+
+ <span class="comment">%Simulation = 'PNJctEqBias';</span>
+ Simulation = <span class="string">'pa6'</span>;
+
+<span class="keyword">if</span> strcmp(Simulation,<span class="string">'GaussianTwoCar'</span>)
+    eval(<span class="string">'SetGaussian2CarParas'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'GaussianTwoCarRC'</span>)
+    eval(<span class="string">'SetGaussian2CarParasRCOnly'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'GaussianTwoCarRCLinGrad'</span>)
+    eval(<span class="string">'SetGaussian2CarParasRCOnlyLinGrad'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'GaussianSingle0V'</span>)
+    eval(<span class="string">'SetGaussian1CarParas0V'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'GaussianSingle1V'</span>)
+    eval(<span class="string">'SetGaussian1CarParas1V'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'ExpDoping'</span>)
+    eval(<span class="string">'SetExpDopingParas'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'PNJct'</span>)
+    eval(<span class="string">'SetPNJctParas'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'PNJctEq'</span>)
+    eval(<span class="string">'SetPNJctParasEqBC'</span>);
+<span class="keyword">elseif</span> strcmp(Simulation,<span class="string">'PNJctEqBias'</span>)
+    eval(<span class="string">'SetPNJctParasEqBCBias'</span>);
+<span class="keyword">elseif</span> strcmp (Simulation,<span class="string">'pa6'</span>)
+    eval(<span class="string">'pa6'</span>)
+<span class="keyword">end</span>
+
+FormGv(nx,LVbc,RVbc); <span class="comment">% Poisson equation set Gv and Bv</span>
+[L,U] = lu(Gv);
+
+Mun = ones(1,nx)*MunSi;
+Dn = ones(1,nx)*DnSi;
+MunM(1:nx-1) = (Mun(1:nx-1) + Mun(2:nx))/2;
+DnM(1:nx-1) = (Dn(1:nx-1) + Dn(2:nx))/2;
+n = zeros(1,nx);
+
+Mup = ones(1,nx)*MupSi;
+Dp = ones(1,nx)*DnSi;
+MupM(1:nx-1) = (Mup(1:nx-1) + Mup(2:nx))/2;
+DpM(1:nx-1) = (Dp(1:nx-1) + Dp(2:nx))/2;
+p = zeros(1,nx);
+
+<span class="keyword">if</span> TwoCarriers == 1
+    ni = NetDoping &gt;= 0;
+    n0(ni) = (NetDoping(ni) + sqrt(NetDoping(ni).^2 + 4* niSi*niSi))/2;
+    p0(ni)  = niSi^2./n0(ni);
+
+    pi = ~ni;
+    p0(pi) = (-NetDoping(pi) + sqrt(NetDoping(pi).^2 + 4* niSi*niSi))/2;
+    n0(pi)  = niSi^2./p0(pi);
+<span class="keyword">else</span>
+    n0  = NetDoping;
+    p0 = zeros(1,nx);
+<span class="keyword">end</span>
+
+n0 = n0 + npDisturbance;
+<span class="keyword">if</span> TwoCarriers == 1
+    p0 = p0 + npDisturbance;
+<span class="keyword">end</span>
+
+divFn = zeros(1,nx);
+divFp = zeros(1,nx);
+
+Rho = zeros(1,nx);
+<span class="keyword">if</span> (Coupled)
+    Rho = C.q_0*(NetDoping - n0 + p0); <span class="comment">% update Rho</span>
+    Rho(1) = 0; <span class="comment">% 1 and nx are BC's</span>
+    Rho(nx) = 0;
+<span class="keyword">end</span>
+
+V = U\(L\(-dx^2/EpiSi*Rho' + Bv'));
+Em(1:nx-1) = -(V(2:nx) - V(1:nx-1))/dx;
+MaxEm = max(abs(Em));
+Maxn = max(n0);
+Ld = sqrt(EpiSi/(C.q_0*Maxn));
+dxMax = Ld/5;
+
+dtMax = min(dx^2/2/max(Dn),dx^2/2/max(Dp));
+
+<span class="keyword">if</span> MaxEm &gt; 0
+    dt = min([2*dx/MaxEm dtMax])/4;
+<span class="keyword">else</span>
+    dt = dtMax/4;
+<span class="keyword">end</span>
+
+t = 0;
+
+n = n0;
+np = n0;
+
+p = p0;
+pp = p0;
+
+PlotVals(nx,dx,<span class="string">'on'</span>,l,TStop,PlotYAxis);
+
+SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+
+<span class="keyword">if</span> SecondSim == 1
+    FormGv(nx,LVbc2,RVbc); <span class="comment">% Poisson equation set Gv and Bv</span>
+    [L,U] = lu(Gv);
+
+    SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+<span class="keyword">end</span>
+
+
+<span class="keyword">if</span> doPlotImage
+    imwrite(im,map,PlotFile,<span class="string">'DelayTime'</span>,0.2,<span class="string">'LoopCount'</span>,inf);
+<span class="keyword">end</span>
+
+
+<span class="comment">% fig2 = figure('Position', [100, 100, 1049, 895]);</span>
+PlotVals(nx,dx,<span class="string">'off'</span>,l,TStop,[]);
+
+<span class="keyword">if</span> doPlotImage
+    f = getframe(fig2);
+    [im,map] = rgb2ind(f.cdata,256,<span class="string">'nodither'</span>);
+
+    filename = strcat(<span class="string">'final-'</span>,PlotFile);
+    imwrite(im,map,filename);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">time: 1.00158e-13 ( 0.71 %)
+time: 2.00316e-13 (  1.4 %)
+time: 3.00474e-13 (  2.1 %)
+time: 4.00632e-13 (  2.8 %)
+time: 5.0079e-13 (  3.5 %)
+time: 6.00084e-13 (  4.2 %)
+time: 7.00242e-13 (  4.9 %)
+time: 8.004e-13 (  5.6 %)
+time: 9.00558e-13 (  6.3 %)
+time: 1.00072e-12 (    7 %)
+time: 1.10001e-12 (  7.7 %)
+time: 1.20017e-12 (  8.5 %)
+time: 1.30033e-12 (  9.2 %)
+time: 1.40048e-12 (  9.9 %)
+time: 1.50064e-12 (   11 %)
+time: 1.6008e-12 (   11 %)
+time: 1.70009e-12 (   12 %)
+time: 1.80025e-12 (   13 %)
+time: 1.90041e-12 (   13 %)
+time: 2.00057e-12 (   14 %)
+time: 2.10073e-12 (   15 %)
+time: 2.20002e-12 (   15 %)
+time: 2.30018e-12 (   16 %)
+time: 2.40034e-12 (   17 %)
+time: 2.50049e-12 (   18 %)
+time: 2.60065e-12 (   18 %)
+time: 2.70081e-12 (   19 %)
+time: 2.80011e-12 (   20 %)
+time: 2.90026e-12 (   20 %)
+time: 3.00042e-12 (   21 %)
+time: 3.10058e-12 (   22 %)
+time: 3.20074e-12 (   23 %)
+time: 3.30003e-12 (   23 %)
+time: 3.40019e-12 (   24 %)
+time: 3.50035e-12 (   25 %)
+time: 3.60051e-12 (   25 %)
+time: 3.70066e-12 (   26 %)
+time: 3.80082e-12 (   27 %)
+time: 3.90012e-12 (   27 %)
+time: 4.00027e-12 (   28 %)
+time: 4.10043e-12 (   29 %)
+time: 4.20059e-12 (   30 %)
+time: 4.30075e-12 (   30 %)
+</pre><pre class="codeoutput error">Error using matlab.graphics.axis.Axes/get
+Operation terminated by user
+
+Error in axis&gt;LocCheckCompatibleLimits (line 239)
+v1 = get(axH,[names{1} 'Lim']);
+
+Error in axis (line 100)
+                error(LocCheckCompatibleLimits(ax(j)));
+
+Error in PlotVals (line 98)
+if scale, axis([ 0 l Yaxis{11}]); end
+
+Error in SimulateFlow (line 64)
+        PlotVals(nx,dx,'off',l,TStop,PlotYAxis);
+
+Error in DriftDiffTran (line 134)
+SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% clear all
+clearvars
+clearvars -GLOBAL
+close all
+format shorte
+set(0,'DefaultFigureWindowStyle','docked')
+global C V Mun Mup Gv Dn Dp Bv Em DnM MunM DpM MupM np pp x xm n p
+global Rho divFp divFn niSi TwoCarriers t EpiSi n0 p0 tauSi
+global Coupled NetDoping l PlotYAxis PlotSS im map
+global PlotCount doPlotImage
+
+C.q_0 = 1.60217653e-19;             % electron charge
+C.hb = 1.054571596e-34;             % Dirac constant
+C.h = C.hb*2*pi;                    % Planck constant
+C.m_0 = 9.10938215e-31;             % electron mass
+C.kb = 1.3806504e-23;               % Boltzmann constant
+C.eps_0 = 8.854187817e-12;          % vacuum permittivity
+C.Mun_0 = 1.2566370614e-6;           % vacuum permeability
+C.c = 299792458;% speed of light
+
+Temp = 300;
+C.Vt = C.kb*Temp/C.q_0;
+
+EpiSi = C.eps_0*11.68;
+MunSi = 1400*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
+DnSi = MunSi*C.kb*Temp/C.q_0; % D = kt/q Mun
+MupSi = 450*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
+DpSi = MunSi*C.kb*Temp/C.q_0; % D = kt/q Mun
+tauSi = 1e-8;
+niSi = 1e10*1e6; % 1/cm^3 * (100 cm/m)^3 intrinsic concentration
+
+JBC = 0; % No flow BC by default
+RVbc = 0; % Ground Rightside
+SecondSim = 0;
+
+PlotSS = 1;
+PlotFile = 'image.gif';
+PlotCount = 0;
+doPlotImage = 0; % set to 1 to draw the image
+
+ %Simulation = 'PNJctEqBias';
+ Simulation = 'pa6';
+
+if strcmp(Simulation,'GaussianTwoCar')
+    eval('SetGaussian2CarParas');
+elseif strcmp(Simulation,'GaussianTwoCarRC')
+    eval('SetGaussian2CarParasRCOnly');
+elseif strcmp(Simulation,'GaussianTwoCarRCLinGrad')
+    eval('SetGaussian2CarParasRCOnlyLinGrad');
+elseif strcmp(Simulation,'GaussianSingle0V')
+    eval('SetGaussian1CarParas0V');
+elseif strcmp(Simulation,'GaussianSingle1V')
+    eval('SetGaussian1CarParas1V');
+elseif strcmp(Simulation,'ExpDoping')
+    eval('SetExpDopingParas');
+elseif strcmp(Simulation,'PNJct')
+    eval('SetPNJctParas');
+elseif strcmp(Simulation,'PNJctEq')
+    eval('SetPNJctParasEqBC');
+elseif strcmp(Simulation,'PNJctEqBias')
+    eval('SetPNJctParasEqBCBias');
+elseif strcmp (Simulation,'pa6')
+    eval('pa6')
+end
+
+FormGv(nx,LVbc,RVbc); % Poisson equation set Gv and Bv
+[L,U] = lu(Gv);
+
+Mun = ones(1,nx)*MunSi;
+Dn = ones(1,nx)*DnSi;
+MunM(1:nx-1) = (Mun(1:nx-1) + Mun(2:nx))/2;
+DnM(1:nx-1) = (Dn(1:nx-1) + Dn(2:nx))/2;
+n = zeros(1,nx);
+
+Mup = ones(1,nx)*MupSi;
+Dp = ones(1,nx)*DnSi;
+MupM(1:nx-1) = (Mup(1:nx-1) + Mup(2:nx))/2;
+DpM(1:nx-1) = (Dp(1:nx-1) + Dp(2:nx))/2;
+p = zeros(1,nx);
+
+if TwoCarriers == 1
+    ni = NetDoping >= 0;
+    n0(ni) = (NetDoping(ni) + sqrt(NetDoping(ni).^2 + 4* niSi*niSi))/2;
+    p0(ni)  = niSi^2./n0(ni);
+
+    pi = ~ni;
+    p0(pi) = (-NetDoping(pi) + sqrt(NetDoping(pi).^2 + 4* niSi*niSi))/2;
+    n0(pi)  = niSi^2./p0(pi);
+else
+    n0  = NetDoping;
+    p0 = zeros(1,nx);
+end
+
+n0 = n0 + npDisturbance;
+if TwoCarriers == 1
+    p0 = p0 + npDisturbance;
+end
+
+divFn = zeros(1,nx);
+divFp = zeros(1,nx);
+
+Rho = zeros(1,nx);
+if (Coupled)
+    Rho = C.q_0*(NetDoping - n0 + p0); % update Rho
+    Rho(1) = 0; % 1 and nx are BC's
+    Rho(nx) = 0;
+end
+
+V = U\(L\(-dx^2/EpiSi*Rho' + Bv'));
+Em(1:nx-1) = -(V(2:nx) - V(1:nx-1))/dx;
+MaxEm = max(abs(Em));
+Maxn = max(n0);
+Ld = sqrt(EpiSi/(C.q_0*Maxn));
+dxMax = Ld/5;
+
+dtMax = min(dx^2/2/max(Dn),dx^2/2/max(Dp));
+
+if MaxEm > 0
+    dt = min([2*dx/MaxEm dtMax])/4;
+else
+    dt = dtMax/4;
+end
+
+t = 0;
+
+n = n0;
+np = n0;
+
+p = p0;
+pp = p0;
+
+PlotVals(nx,dx,'on',l,TStop,PlotYAxis);
+
+SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+
+if SecondSim == 1
+    FormGv(nx,LVbc2,RVbc); % Poisson equation set Gv and Bv
+    [L,U] = lu(Gv);
+
+    SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+end
+
+
+if doPlotImage
+    imwrite(im,map,PlotFile,'DelayTime',0.2,'LoopCount',inf);
+end
+
+
+% fig2 = figure('Position', [100, 100, 1049, 895]);
+PlotVals(nx,dx,'off',l,TStop,[]);
+
+if doPlotImage
+    f = getframe(fig2);
+    [im,map] = rgb2ind(f.cdata,256,'nodither');
+
+    filename = strcat('final-',PlotFile);
+    imwrite(im,map,filename);
+end
+
+##### SOURCE END #####
+--></body></html>
