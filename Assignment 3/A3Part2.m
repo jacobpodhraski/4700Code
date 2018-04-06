@@ -4,8 +4,8 @@ close all;
 clear
 clearvars
 
-nx = 50;
-ny = 50;
+nx = 100;
+ny = 200;
 G = sparse (nx*ny,nx*ny);
 j = 1;
 o0 = 1;
@@ -25,9 +25,9 @@ for i=1:1:ny
 %         else
 %             Cmap(i,j) = 1;
 %         end
-        if i>=0.4*nx && i<=0.6*nx && j<=0.4*ny
+        if i>=75 && i<=125 && j<=40
             Cmap(i,j) = .01;
-        elseif i>=0.4*nx && i<=0.6*nx && j>=0.6*ny
+        elseif i>=75 && i<=125 && j>=60
             Cmap(i,j) = .01;
         else
             Cmap(i,j) = 1;
@@ -120,6 +120,7 @@ for i=1:1:ny
          n = j +(i-1)*nx;
 
         X(j,i) = V(n);
+
     end
 end
 
@@ -132,16 +133,16 @@ end
    
    
    figure(3);
-   [Ex,Ey] = gradient(X);
+   [Ey,Ex] = gradient(X);
    quiver(Ex,Ey);
    title 'Electric Field';
    xlabel 'x direction';
    ylabel 'y direction';
    
-   figure(4);
-   Jx = Cmap.*Ex;
-   Jy = Cmap.*Ey;
-   quiver(Jx,Jy);
-   title 'Current Density';
-   xlabel 'Jx';
-   ylabel 'Jy';
+%    figure(4);
+%    Jx = Cmap.*Ex;
+%    Jy = Cmap.*Ey;
+%    quiver(Jx,Jy);
+%    title 'Current Density';
+%    xlabel 'Jx';
+%    ylabel 'Jy';
