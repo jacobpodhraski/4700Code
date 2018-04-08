@@ -83,7 +83,7 @@ end
 
 figure (3);
 hist(real(yup3(:,2)),20);
-title 'Histogram of Capacitor values';
+title 'Histogram of Gain with random Cap values';
 grid minor;
 
 %Part 2 A
@@ -228,11 +228,18 @@ grid minor;
 
 
 Cn = 0.00001;
+
+
+
 C = zeros(7,7);
 C(2,1) = -c;
 C(2,2) = c;
 C(3,3) = -L;
 C(4,4) = -Cn;
+
+
+
+
 % C(6,4) = -Cn;
 
 
@@ -245,7 +252,7 @@ step = 0.01;
 Vold = [1;0;0;0;0;0;0];
 Vnew = [1;0;0;0;0;0;0];
 
-%Part 2 
+%Part 3 
 for i=0.001:0.001:1000*10^-3
                 F(7,1) = randn(1,1);
                 F(1,1) = (exp(-(i-0.06).^2/(2*step)));
